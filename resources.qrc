@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/icon.png</file>
+        <file>img/iconSourceA.png</file>
+        <file>img/iconSourceB.png</file>
+        <file>img/iconUnknownSources.png</file>
+        <file>img/sourceA.png</file>
+        <file>img/sourceB.png</file>
+        <file>img/iconUnsetSources.png</file>
+    </qresource>
+</RCC>
