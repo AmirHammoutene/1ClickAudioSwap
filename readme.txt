@@ -1,3 +1,6 @@
+Download for Windows :
+[a link](https://github.com/AmirHammoutene/1ClickAudioSwap/blob/master/1ClickAudioSwap-setup-1.0.0.exe)
+
 Easily swap between 2 audio devices on Windows
 
 GitHub link for sources : https://github.com/AmirHammoutene/1ClickAudioSwap
