@@ -28,6 +28,8 @@ MainWidget::MainWidget(QWidget *parent) :
     iconUpdate();
 
     connect(sticon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(swapDeviceFromIconClick(QSystemTrayIcon::ActivationReason)));
+
+    saveSettings();
 }
 
 MainWidget::~MainWidget()
@@ -44,7 +46,7 @@ void MainWidget::buildContextMenu()
     titleFont.setBold(true);
     titleAction->setFont(titleFont);
 
-    swapAction =  new QAction(tr("Swap (same as a click on app icon)"),stmenu);
+    swapAction =  new QAction(tr("Swap (same as a click on the system tray icon)"),stmenu);
     connect(swapAction, SIGNAL(triggered()), this, SLOT(swapDevice()));
 
     configureMenu = new QMenu(tr("Configure the Swap"),stmenu);
@@ -229,7 +231,7 @@ void MainWidget::iconUpdate()
     }
     else
     {
-        tooltip = actualDefaultDeviceName;
+        tooltip = "["+actualDefaultDeviceName+"]";
         if(actualDefaultDeviceName == sourceAname)
         {
             if(sourceBname != undefinedStr)
@@ -293,6 +295,8 @@ void MainWidget::refreshDevicesLists()
     buildListChangeAudioOutput();
     buildConfigureSwapMenu();
     applySettings();
+    iconUpdate();
+    saveSettings();
 }
 
 void MainWidget::swapDeviceFromIconClick(QSystemTrayIcon::ActivationReason reason)
@@ -312,6 +316,7 @@ void MainWidget::quitApp()
 void MainWidget::changeStartupOption(bool checked)
 {
     doLaunchOnStartup = checked;
+    saveSettings();
 }
 
 void MainWidget::onChangeListAudioOutput(QAction *action)
@@ -324,6 +329,7 @@ void MainWidget::onChangeListAudioOutput(QAction *action)
 
     executeAudioDeviceChange(actualDefaultDeviceName);
     iconUpdate();
+    saveSettings();
 }
 
 void MainWidget::onSourceAChoice(QAction *action)
@@ -334,6 +340,7 @@ void MainWidget::onSourceAChoice(QAction *action)
     sourceAname = action->text();
 
     iconUpdate();
+    saveSettings();
 }
 
 void MainWidget::onSourceBChoice(QAction *action)
@@ -344,4 +351,5 @@ void MainWidget::onSourceBChoice(QAction *action)
     sourceBname = action->text();
 
     iconUpdate();
+    saveSettings();
 }
