@@ -14,21 +14,25 @@ const QString MainWidget::AppName = "1ClickAudioSwap";
 MainWidget::MainWidget(QWidget *parent) :
     QWidget(parent)
 {
+    // Will be a system tray app, no window shown
     sticon = new QSystemTrayIcon(this);
     sticon->setIcon(QIcon(":/img/icon.png"));
 
     buildContextMenu();
     sticon->setContextMenu(stmenu);
 
+    // Loads and applies settings saved (such as "launch on Windows startup" or the devices we used at last run
     loadSettings();
     applySettings();
 
     sticon->show();
 
+    // Updates the system tray icon state and tooltip
     iconUpdate();
 
     connect(sticon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(swapDeviceFromIconClick(QSystemTrayIcon::ActivationReason)));
 
+    // Saves settings to be sure the "launch on Windows startup" entry in register is correctly done (otherwise, in case of first launch and crash before quit, it wouldn't)
     saveSettings();
 }
 
@@ -36,6 +40,7 @@ MainWidget::~MainWidget()
 {
 }
 
+//Builds the menu when right click on system tray icon
 void MainWidget::buildContextMenu()
 {
     stmenu = new QMenu(this);
@@ -114,7 +119,6 @@ void MainWidget::applySettings()
                 act->setChecked(true);
         }
     }
-
 }
 
 void MainWidget::saveSettings()
@@ -124,6 +128,7 @@ void MainWidget::saveSettings()
     settings.setValue("sourceAname", sourceAname);
     settings.setValue("sourceBname", sourceBname);
 
+    // Saves or deletes key in register for launching on Windows startup
     if(doLaunchOnStartup)
     {
         QSettings startSettings("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
@@ -138,6 +143,7 @@ void MainWidget::saveSettings()
 
 }
 
+// Builds sub menu "Configure Swap"
 void MainWidget::buildConfigureSwapMenu()
 {
     configureMenu->clear();
@@ -182,6 +188,7 @@ void MainWidget::buildConfigureSwapMenu()
     connect(listSourceBMenu, SIGNAL(triggered(QAction*)), this, SLOT(onSourceBChoice(QAction*)));
 }
 
+// Builds sub menu to manually change default audio device
 void MainWidget::buildListChangeAudioOutput()
 {
     listChangeAudioOutputMenu->clear();
@@ -206,6 +213,7 @@ void MainWidget::buildListChangeAudioOutput()
     connect(listChangeAudioOutputMenu, SIGNAL(triggered(QAction*)), this, SLOT(onChangeListAudioOutput(QAction*)));
 }
 
+// Uses a executable process for setting the default audio device
 void MainWidget::executeAudioDeviceChange(const QString &targetDeviceName)
 {
     QProcess *process = new QProcess(this);
@@ -213,6 +221,7 @@ void MainWidget::executeAudioDeviceChange(const QString &targetDeviceName)
     process->waitForFinished();
 }
 
+// Updates the system tray icon state and tooltip
 void MainWidget::iconUpdate()
 {
     QString iconName;
@@ -221,7 +230,7 @@ void MainWidget::iconUpdate()
     QString swapSentence = tr("Click to swap to ");
 
     if(actualDefaultDeviceName != sourceAname && actualDefaultDeviceName != sourceBname
-            && sourceAname != undefinedStr && sourceBname != undefinedStr)
+            && sourceAname != undefinedStr && sourceBname != undefinedStr) // In case the devices for the swap are not configured
     {
         iconName = ":/img/iconUnknownSources.png";
         if(tooltip.isEmpty())
@@ -264,6 +273,7 @@ void MainWidget::iconUpdate()
     sticon->setToolTip(tooltip);
 }
 
+// On Swap action
 void MainWidget::swapDevice()
 {
     if(sourceAname == undefinedStr || sourceBname == undefinedStr)
@@ -281,6 +291,7 @@ void MainWidget::swapDevice()
         executeAudioDeviceChange(actualDefaultDeviceName);
         iconUpdate();
 
+        // Refresh the device to be checked for the sub menu that permits to manually change the audio device
         for(auto act : listChangeAudioOutputMenu->actions())
         {
             act->setChecked(false);
@@ -290,6 +301,7 @@ void MainWidget::swapDevice()
     }
 }
 
+// Refreshes all audio devices if needed (in case of connection/disconnection of device for example)
 void MainWidget::refreshDevicesLists()
 {
     buildListChangeAudioOutput();

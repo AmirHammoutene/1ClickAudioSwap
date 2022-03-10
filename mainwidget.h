@@ -12,6 +12,7 @@ namespace Ui {
 class MainWidget;
 }
 
+// Declared as a QWidget, but will be used as a system tray icon
 class MainWidget : public QWidget
 {
     Q_OBJECT
